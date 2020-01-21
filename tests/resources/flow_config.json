@@ -1,0 +1,96 @@
+{
+  "ReleaseLabel": "emr-5.23.0",
+  "Name": "prod-data-loading-cluster",
+  "Tags": [
+    {
+      "Value": "prod-data-loading-cluster",
+      "Key": "Name"
+    },
+    {
+      "Value": "prod",
+      "Key": "Environment"
+    }
+  ],
+  "us-east-1": {
+    "Instances": {
+      "Ec2SubnetId": "subnet-abc123",
+      "InstanceGroups": [
+        {
+          "InstanceRole": "MASTER",
+          "InstanceCount": 1,
+          "Name": "Master-instance-group-1",
+          "Market": "ON_DEMAND",
+          "InstanceType": "m3.xlarge"
+        },
+        {
+          "InstanceRole": "CORE",
+          "InstanceCount": 1,
+          "Name": "Core-instance-group-1",
+          "Market": "SPOT",
+          "BidPrice": "0.25",
+          "InstanceType": "m3.xlarge"
+        }
+      ]
+    },
+    "JobFlowRole": "EMR_EC2_DefaultRole",
+    "ServiceRole": "EMR_DefaultRole"
+  },
+  "us-west-2": {
+    "Instances": {
+      "Ec2SubnetId": "subnet-abc124",
+      "InstanceGroups": [
+        {
+          "InstanceRole": "MASTER",
+          "InstanceCount": 1,
+          "Name": "Master-instance-group-1",
+          "Market": "ON_DEMAND",
+          "InstanceType": "m3.xlarge"
+        },
+        {
+          "InstanceRole": "CORE",
+          "InstanceCount": 1,
+          "Name": "Core-instance-group-1",
+          "Market": "SPOT",
+          "BidPrice": "0.25",
+          "InstanceType": "m3.xlarge"
+        }
+      ]
+    },
+    "JobFlowRole": "EMR_EC2_DefaultRole",
+    "ServiceRole": "EMR_DefaultRole"
+  },
+  "BootstrapActions": [
+    {
+      "ScriptBootstrapAction": {
+        "Path": "s3://elasticmapreduce/backup/libs/hive/0.7/install-hive.sh",
+        "Args": [
+          "--region",
+          "us-east-1"
+        ]
+      },
+      "Name": "Install Hive"
+    }
+  ],
+  "Applications": [
+    {
+      "Name": "Spark"
+    }
+  ],
+  "Steps": [
+    {
+      "Args": [
+        "spark-submit",
+        "--deploy-mode",
+        "cluster",
+        "--class",
+        "com.example",
+        "--driver-java-options",
+        "-Dconfig.resource=/configs/prod.conf",
+        "s3://elasticmapreduce/amiroller/AWSJavaClientRuntime-1.0.jar"
+      ],
+      "Name": "Spark Application",
+      "ActionOnFailure": "CONTINUE"
+    }
+  ],
+  "LogUri": "s3://elasticmapreduce/logs/"
+}

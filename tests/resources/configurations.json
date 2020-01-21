@@ -1,0 +1,15 @@
+[
+  {
+    "Classification": "hadoop-env",
+    "Properties": {},
+    "Configurations": [
+      {
+        "Classification": "export",
+        "Properties": {
+          "JAVA_HOME": "/usr/lib/jvm/java-1.8.0"
+        },
+        "Configurations": []
+      }
+    ]
+  }
+]

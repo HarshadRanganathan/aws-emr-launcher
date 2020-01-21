@@ -1,0 +1,53 @@
+---
+# =================================================================
+# Constants
+# =================================================================
+ClusterFailureActions:
+  Terminate: &TerminateCluster TERMINATE_CLUSTER
+  Continue: &ContinueCluster CONTINUE
+
+# =================================================================
+# EMR Cluster Configuration
+#
+# Syntax guide -
+# https://boto3.readthedocs.io/en/latest/reference/services/emr.html#EMR.Client.run_job_flow
+#
+# Any environment specific configuration should be provided in the respective env config files
+# They will override the default configuration
+#
+# Note: Step definitions should only be specified in the default config
+# =================================================================
+Emr:
+  Name: &EmrName '${ENVIRONMENT}-data-loading-cluster'
+  LogUri: 's3://elasticmapreduce/logs/'
+  ReleaseLabel: emr-5.23.0
+
+  # third-party software to be added to the cluster
+  Applications:
+    - Name: Spark
+
+  # bootstrap actions
+  BootstrapActions :
+    - Name: Install Hive
+      ScriptBootstrapAction:
+        Path: 's3://elasticmapreduce/backup/libs/hive/0.7/install-hive.sh'
+        Args: [--region, '${REGION}']
+
+  # Job flow steps
+  Steps:
+    - Name: Spark Application
+      ActionOnFailure: *ContinueCluster
+      Args: [spark-submit,
+            --deploy-mode, cluster,
+            --class, com.example,
+            --driver-java-options,
+            '-Dconfig.resource=/config/${ENVIRONMENT}.conf',
+            's3://elasticmapreduce/amiroller/AWSJavaClientRuntime-${VERSION}.jar']
+
+  # tags to associate with a cluster
+  Tags:
+    - Key: Name
+      Value: *EmrName
+    - Key: Environment
+      Value: '${ENVIRONMENT}'
+...

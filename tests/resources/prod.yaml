@@ -1,0 +1,51 @@
+---
+# =================================================================
+# Anchors for properties across regions
+# =================================================================
+MasterInstanceType: &MasterInstanceType m3.xlarge
+MasterInstanceCount: &MasterInstanceCount 1
+SpotInstanceType: &SpotInstanceType m3.xlarge
+SpotInstanceCount: &SpotInstanceCount 1
+BidPrice: &BidPrice '0.25'
+
+# Instance configuration for each AWS region
+# Region Names should be in valid format e.g. us-east-1
+Emr:
+  us-east-1:
+    Instances:
+      InstanceGroups:
+        - Name: Master-instance-group-1
+          Market: ON_DEMAND
+          InstanceRole: MASTER
+          InstanceType: *MasterInstanceType
+          InstanceCount: *MasterInstanceCount
+        - Name: Core-instance-group-2
+          Market: SPOT
+          InstanceRole: CORE
+          BidPrice: *BidPrice
+          InstanceType: *SpotInstanceType
+          InstanceCount: *SpotInstanceCount
+      Ec2SubnetId: subnet-abc123
+      EmrManagedMasterSecurityGroup: sg-abc123
+      EmrManagedSlaveSecurityGroup: sg-abc124
+    JobFlowRole: EMR_EC2_DefaultRole
+    ServiceRole: EMR_DefaultRole
+
+  us-west-2:
+    Instances:
+      InstanceGroups:
+        - Name: Master-instance-group-1
+          Market: ON_DEMAND
+          InstanceRole: MASTER
+          InstanceType: *MasterInstanceType
+          InstanceCount: *MasterInstanceCount
+        - Name: Core-instance-group-2
+          Market: SPOT
+          InstanceRole: CORE
+          BidPrice: *BidPrice
+          InstanceType: *SpotInstanceType
+          InstanceCount: *SpotInstanceCount
+      Ec2SubnetId: subnet-abc124
+    JobFlowRole: EMR_EC2_DefaultRole
+    ServiceRole: EMR_DefaultRole
+...

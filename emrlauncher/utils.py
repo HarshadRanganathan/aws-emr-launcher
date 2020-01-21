@@ -1,5 +1,5 @@
 import re
-import collections
+from collections.abc import Mapping
 from copy import deepcopy
 from typing import Dict
 
@@ -37,7 +37,7 @@ def dict_merge(dct: dict, merge_dct: dict) -> dict:
     """
     dct = deepcopy(dct)
     for key, value in merge_dct.items():
-        if isinstance(dct.get(key), dict) and isinstance(value, collections.Mapping):
+        if isinstance(dct.get(key), dict) and isinstance(value, Mapping):
             dct[key] = dict_merge(dct[key], value)
         else:
             dct[key] = value
