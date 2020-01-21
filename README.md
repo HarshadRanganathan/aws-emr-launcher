@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.com/HarshadRanganathan/aws-emr-launcher.svg?branch=master)](https://travis-ci.com/HarshadRanganathan/aws-emr-launcher)
