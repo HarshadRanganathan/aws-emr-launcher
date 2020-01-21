@@ -27,7 +27,7 @@ setup(
     keywords="AWS EMR",
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[
-        "pyyaml"
+        "boto3"
     ],
     python_requires='>=3.7',
 )

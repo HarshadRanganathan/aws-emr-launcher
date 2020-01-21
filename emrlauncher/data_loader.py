@@ -51,7 +51,7 @@ def trigger_data_load(
                 )
             )
 
-            emr_launcher.create_cluster(
+            response = emr_launcher.create_cluster(
                 flow_config=runtime_flow_config,
                 cluster_config=config_parser.cluster_config,
                 region=region,
@@ -63,5 +63,7 @@ def trigger_data_load(
                     action_on_failure=step.get("ActionOnFailure"),
                     args=step.get("Args"),
                 )
+
+            return response
         else:
             raise Exception("Instance config missing for region {}".format(region))
