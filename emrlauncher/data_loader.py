@@ -1,16 +1,24 @@
-import boto3
-import ast
+from typing import List, Dict
 import logging
+import ast
+import boto3
+
 from emrlauncher.config_parser import ConfigParser
 from emrlauncher.emr_launcher import EmrLauncher
 from emrlauncher.utils import substitute_placeholders_with_values
 
-session = boto3.session.Session()
+SESSION = boto3.session.Session()
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
-def trigger_data_load(regions, cluster_config_path, default_config_path, env_config_path, input_vars):
+def trigger_data_load(
+        regions: List[str],
+        cluster_config_path: str,
+        default_config_path: str,
+        env_config_path: str,
+        input_vars: Dict[str, str],
+) -> dict:
     """
     :param regions: AWS regions in which the EMR job needs to be triggered
     :type regions: list
@@ -25,34 +33,35 @@ def trigger_data_load(regions, cluster_config_path, default_config_path, env_con
     :return:
     """
     config_parser = ConfigParser()
-    config_parser.load_configuration(cluster_config_path, default_config_path, env_config_path, input_vars)
+    config_parser.load_configuration(
+        cluster_config_path, default_config_path, env_config_path, input_vars
+    )
 
     for region in regions:
 
-        input_vars['REGION'] = region # expose runtime information
+        input_vars["REGION"] = region  # expose runtime information
 
         if region in config_parser.flow_config:
-            emr_client = session.client(service_name='emr', region_name=region)
+            emr_client = SESSION.client(service_name="emr", region_name=region)
             emr_launcher = EmrLauncher(emr_client)
 
             runtime_flow_config = ast.literal_eval(
                 substitute_placeholders_with_values(
-                    str(config_parser.flow_config),
-                    input_vars
+                    str(config_parser.flow_config), input_vars
                 )
             )
 
             emr_launcher.create_cluster(
                 flow_config=runtime_flow_config,
                 cluster_config=config_parser.cluster_config,
-                region=region
+                region=region,
             )
 
-            for step in runtime_flow_config['Steps']:
+            for step in runtime_flow_config["Steps"]:
                 emr_launcher.add_step(
-                    step_name=step.get('Name'),
-                    action_on_failure=step.get('ActionOnFailure'),
-                    args=step.get('Args')
+                    step_name=step.get("Name"),
+                    action_on_failure=step.get("ActionOnFailure"),
+                    args=step.get("Args"),
                 )
         else:
-            raise Exception('Instance config missing for region {}'.format(region))
+            raise Exception("Instance config missing for region {}".format(region))
