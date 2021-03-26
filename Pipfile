@@ -11,7 +11,7 @@ black = "*"
 pylint = "*"
 
 [packages]
-pyyaml = "==5.2"
+pyyaml = "==5.4"
 
 [requires]
 python_version = "3.7"
